@@ -5,8 +5,8 @@ on:
     branches: ['**']
   workflow_dispatch:
     inputs:
-      tag:
-        description: "Tag/Branch name to use for build & tests"
+      database_image_tag:
+        description: "Database Tag/Branch name to use for running tests"
         required: true
         default: "master"
         type: string
@@ -92,4 +92,4 @@ jobs:
           export core_tag=${{ github.ref_name }}
           echo "Running ${{ matrix.db }} test cases for tag: $core_tag"
           
-          source test_case.sh "$core_tag" "master"
+          source test_case.sh "$core_tag" ${{ inputs.database_image_tag }}
