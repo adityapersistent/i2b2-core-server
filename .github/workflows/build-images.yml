@@ -71,7 +71,7 @@ jobs:
       - name: Checkout Test Repository
         uses: actions/checkout@v4
         with:
-          repository: i2b2/i2b2-docker
+          repository: adityapersistent/i2b2-docker
           path: i2b2-docker
           
       - name: Run Test Cases
