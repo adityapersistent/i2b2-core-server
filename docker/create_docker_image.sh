@@ -2,7 +2,7 @@
 set -e
 
 CORE_SERVER_TAG=$1
-export CORE_SERVER_TAG="${CORE_SERVER_TAG//\//-}"
+export CORE_SERVER_TAG=$(echo "$1" | tr '/' '-')
 export WORKSPACE_DIR=${2:-$(pwd)}
 # CORE_SERVER_REPO="/home/runner/work/i2b2-core-server/i2b2-core-server/"
 
