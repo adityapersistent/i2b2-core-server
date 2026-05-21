@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 export CORE_SERVER_TAG=$1
 CORE_SERVER_REPO="/home/runner/work/i2b2-core-server/i2b2-core-server/"
 
