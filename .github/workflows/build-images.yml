@@ -64,7 +64,7 @@ jobs:
     strategy:
       fail-fast: false # Prevents one failing DB test from cancelling the others
       matrix:
-        db: [mssql, pgsql, oracle]
+        db: [mssql, pg, oracle]
 
     steps:
       # Checkout the target test repository directly to save time writing clone scripts
@@ -73,12 +73,21 @@ jobs:
         with:
           repository: adityapersistent/i2b2-docker
           path: i2b2-docker
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HOST }}
+          password: ${{ secrets.DOCKER_LOGIN_TOKEN }}          
           
       - name: Run Test Cases
         run: |
           set -e
           cd i2b2-docker/${{ matrix.db }}
-          
+
+          export docker_username=${{ secrets.DOCKER_HOST }}
+          export docker_reponame=${{ secrets.DOCKER_REPO }}
+
           # We can pull the ref_name dynamically or pass it from the build job outputs
           export core_tag=${{ github.ref_name }}
           echo "Running ${{ matrix.db }} test cases for tag: $core_tag"
