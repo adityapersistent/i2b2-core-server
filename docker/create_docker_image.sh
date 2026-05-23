@@ -16,7 +16,9 @@ if [ -z "$docker_username" ] && [ ! -d "/home/runner/work/i2b2-core-server/i2b2-
 fi
 
 cd "$CORE_SERVER_REPO";
-
+pwd
+ls 
+sleep 10
 cd edu.harvard.i2b2.server-common && ant clean dist war; #for push/commit  branch
 cp dist/i2b2.war $CORE_SERVER_REPO/docker/configuration/customization/;
 cd $CORE_SERVER_REPO/docker/configuration;
