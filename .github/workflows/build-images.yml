@@ -59,7 +59,7 @@ jobs:
           export docker_username=${{ secrets.DOCKER_HOST }}
           export docker_reponame=${{ secrets.DOCKER_REPO }}
           cd docker 
-          sh docker/create_docker_image.sh "$CORE_SERVER_TAG"
+          sh create_docker_image.sh "$CORE_SERVER_TAG"
  
       - name: List docker images
         run: docker images
