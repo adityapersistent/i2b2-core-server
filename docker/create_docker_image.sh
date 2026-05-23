@@ -1,7 +1,7 @@
 export CORE_SERVER_TAG=${1:-"local"}
 echo "Core Server Tag - " $CORE_SERVER_TAG
 
-CORE_SERVER_REPO=$(pwd)/../
+CORE_SERVER_REPO=$(pwd)/..
 
 #for local docker build
 if [ -z "$docker_username" ] && [ ! -d "/home/runner/work/i2b2-core-server/i2b2-core-server/" ]; then
