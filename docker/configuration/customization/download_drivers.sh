@@ -4,8 +4,8 @@ cd customization/
 export jdbc_mssql_driver_version=${jdbc_mssql_driver_version:-8.2.2}
 export jdbc_pg_driver_version=${jdbc_pg_driver_version:-42.7.8}
 
-echo "Downloading MSSQL - $jdbc_mssql_driver_version"
-echo "Downloading PGSQL - $jdbc_pg_driver_version"
+echo "Downloading MSSQL - mssql-jdbc-${jdbc_mssql_driver_version}.jre8.jar Version"
+echo "Downloading PGSQL - postgresql-${jdbc_pg_driver_version}.jar Version "
 echo "The Oracle driver requires login, so it has already been downloaded."
 
 export jdbc_mssql_driver_download_url=https://github.com/Microsoft/mssql-jdbc/releases/download/v${jdbc_mssql_driver_version}/mssql-jdbc-${jdbc_mssql_driver_version}.jre8.jar
