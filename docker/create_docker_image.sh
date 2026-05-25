@@ -19,11 +19,11 @@ fi
 
 cd "$CORE_SERVER_REPO";
 
-cd edu.harvard.i2b2.server-common && ant clean dist war; #for push/commit  branch
+cd edu.harvard.i2b2.server-common && ant clean dist war; 
 cp dist/i2b2.war $CORE_SERVER_REPO/docker/configuration/customization/;
 cd $CORE_SERVER_REPO/docker/configuration;
 
-# sh customization/download_drivers.sh
+bash customization/download_drivers.sh
 
 docker build -t $docker_username/$docker_reponame:i2b2-core-server_$CORE_SERVER_TAG .
 docker push $docker_username/$docker_reponame:i2b2-core-server_$CORE_SERVER_TAG
