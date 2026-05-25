@@ -53,7 +53,7 @@ jobs:
           export docker_reponame=${{ secrets.DOCKER_REPO }}
           
           # Pass GITHUB_WORKSPACE to avoid hardcoded runner paths in the sh script
-          bash docker/create_docker_image.sh "$CORE_SERVER_TAG" "${{ github.workspace }}"
+          bash docker/create_docker_image.sh "$CORE_SERVER_TAG"
 
   test:   
     name: Run DB Tests
