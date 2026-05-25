@@ -72,7 +72,7 @@ jobs:
       - name: Checkout Test Repository
         uses: actions/checkout@v4
         with:
-          repository: adityapersistent/i2b2-docker
+          repository: i2b2/i2b2-docker
           path: i2b2-docker
 
       - name: Login to Docker Registry

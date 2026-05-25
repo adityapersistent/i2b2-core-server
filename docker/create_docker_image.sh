@@ -1,8 +1,6 @@
 export CORE_SERVER_TAG=${1:-"local"}
 echo "Core Server Tag - " $CORE_SERVER_TAG
 
-ls
-pwd
 CORE_SERVER_REPO=$(pwd)/..
 
 #local build or CI build
@@ -20,8 +18,6 @@ else
 fi
 
 cd "$CORE_SERVER_REPO";
-ls
-pwd
 
 cd edu.harvard.i2b2.server-common && ant clean dist war; 
 cp dist/i2b2.war $CORE_SERVER_REPO/docker/configuration/customization/;
