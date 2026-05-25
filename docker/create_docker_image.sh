@@ -3,10 +3,21 @@ echo "Core Server Tag - " $CORE_SERVER_TAG
 
 CORE_SERVER_REPO=$(pwd)/..
 
-#for local docker build
+#local build or CI build
+if [ "$CI" = "true" ]; then
+    echo "Running in GitHub Actions.."
+else
+    echo "Running Locally.."
+    echo "This script requires sudo access to install openjdk-21 & ant ."
+    export docker_username="local"
+    export docker_reponame="local"
+    sudo apt-get update
+    sudo apt install -y openjdk-21-jdk ant 
+    java --version
+    sleep 10
+
 if [ -z "$docker_username" ] && [ ! -d "/home/runner/work/i2b2-core-server/i2b2-core-server/" ]; then
     echo "This script requires sudo access to install openjdk-21 & ant ."
-    sleep 5
     export docker_username="local"
     export docker_reponame="local"
     sudo apt-get update
