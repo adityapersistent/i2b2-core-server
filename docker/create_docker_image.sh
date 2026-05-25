@@ -1,4 +1,4 @@
-export CORE_SERVER_TAG=${1:-"local"}
+export CORE_SERVER_TAG=$(echo "$1" | tr '/' '-')
 echo "Core Server Tag - " $CORE_SERVER_TAG
 
 CORE_SERVER_REPO=$(pwd)/..
