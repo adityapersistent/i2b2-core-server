@@ -105,6 +105,13 @@ jobs:
           repository: adityapersistent/i2b2-docker
           path: i2b2-docker
 
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HOST }}
+          password: ${{ secrets.DOCKER_LOGIN_TOKEN }}         
+
       - name: Deploy using Docker Compose
         working-directory: i2b2-docker/mssql
         shell: bash
@@ -122,6 +129,10 @@ jobs:
           echo "$safe_core_branch"
           # safe_data_branch=$(echo "$i2b2_data_branch" | tr '/' '-')
 
+
+          export docker_username=${{ secrets.DOCKER_HOST }}
+          export docker_reponame=${{ secrets.DOCKER_REPO }}
+          
           # Build the image variables using the sanitized tags
           core_server_image="${docker_username}/${docker_reponame}:i2b2-core-server_${safe_core_branch}"
           # pgsql_image="${docker_username}/${docker_reponame}:i2b2-data-pgsql_${safe_data_branch}"
