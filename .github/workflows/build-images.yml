@@ -13,23 +13,6 @@ on:
 
 jobs:
 
-  docker-check:
-    name: Verify Self-Hosted Runner Docker
-    runs-on: [self-hosted, Linux, X64]
-    if: github.ref == 'refs/heads/master'
-
-    steps:
-      - name: Verify Docker
-        run: |
-          docker --version
-          docker compose version
-          docker ps
-
-      - name: Test Compose
-        run: |
-          docker compose version
-
-
   build:
     name: Build & Publish i2b2-core-server image
     runs-on: ubuntu-latest
@@ -107,3 +90,45 @@ jobs:
           echo "Running ${{ matrix.db }} test cases for tag: $core_tag"
           
           bash test_case.sh "$core_tag" ${{ inputs.database_image_branch }}
+
+  
+  deploy:
+    name: Deploy i2b2 on AlmaLinux Enclave VM
+    runs-on: [self-hosted, Linux, X64]
+    if: github.ref == 'refs/heads/master'
+    needs: build 
+
+    steps:
+      - name: Checkout deployment repository
+        uses: actions/checkout@v4
+        with:
+          repository: adityapersistent/i2b2-docker
+          path: i2b2-docker
+
+      - name: Deploy using Docker Compose
+        working-directory: i2b2-docker/mssql
+        shell: bash
+        run: |
+          # set -Eeuo pipefail
+
+          docker compose stop
+          echo "core_tag=${{ github.ref_name }}" >> $GITHUB_ENV
+
+
+          # Add your existing sed commands here
+          safe_core_branch=$(echo "$core_tag" | tr '/' '-')
+          echo "$safe_core_branch"
+          # safe_data_branch=$(echo "$i2b2_data_branch" | tr '/' '-')
+
+          # Build the image variables using the sanitized tags
+          core_server_image="${docker_username}/${docker_reponame}:i2b2-core-server_${safe_core_branch}"
+          # pgsql_image="${docker_username}/${docker_reponame}:i2b2-data-pgsql_${safe_data_branch}"
+
+          #updating docker image tag
+          # sed -i "s|i2b2/i2b2-webclient:\${I2B2_WEBCLIENT_TAG}|$docker_username/$docker_reponame:i2b2-webclient_latest|g" docker-compose.yml
+          sed -i "s|i2b2/i2b2-core-server:\${I2B2_CORE_SERVER_TAG}|$core_server_image|g" docker-compose.yml
+          # sed -i "s|i2b2/i2b2-data-pgsql:\${I2B2_DATA_PGSQL_TAG}|$pgsql_image|g" docker-compose.yml          
+
+          docker compose up -d
+          docker compose ps
+
