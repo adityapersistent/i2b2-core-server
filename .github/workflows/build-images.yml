@@ -120,7 +120,7 @@ jobs:
         run: |
           # set -Eeuo pipefail
 
-          docker compose stop
+          docker rm -f i2b2-webclient i2b2-core-server i2b2-data-mssql
           # echo "core_tag=${{ github.ref_name }}" >> $GITHUB_ENV
           export core_tag=${{ github.ref_name }}
 
