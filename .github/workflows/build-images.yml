@@ -112,9 +112,11 @@ jobs:
           # set -Eeuo pipefail
 
           docker compose stop
-          echo "core_tag=${{ github.ref_name }}" >> $GITHUB_ENV
+          # echo "core_tag=${{ github.ref_name }}" >> $GITHUB_ENV
+          export core_tag=${{ github.ref_name }}
 
-
+          echo $core_tag
+          echo "hello"
           # Add your existing sed commands here
           safe_core_branch=$(echo "$core_tag" | tr '/' '-')
           echo "$safe_core_branch"
