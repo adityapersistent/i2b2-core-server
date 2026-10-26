@@ -36,6 +36,7 @@ import edu.harvard.i2b2.ontology.datavo.i2b2message.BodyType;
 import edu.harvard.i2b2.ontology.datavo.i2b2message.MessageHeaderType;
 import edu.harvard.i2b2.ontology.datavo.i2b2message.ResponseHeaderType;
 import edu.harvard.i2b2.ontology.datavo.i2b2message.ResponseMessageType;
+import edu.harvard.i2b2.ontology.datavo.i2b2message.SecurityType;
 import edu.harvard.i2b2.ontology.datavo.pm.ProjectType;
 import edu.harvard.i2b2.ontology.datavo.vdo.ConceptType;
 import edu.harvard.i2b2.ontology.datavo.vdo.ConceptsType;
@@ -49,11 +50,13 @@ public class GetNameInfoHandler extends RequestHandler {
 	private GetNameInfoDataMessage  nameInfoMsg = null;
 	private VocabRequestType vocabType = null;
 	private ProjectType project = null; 
-
+	private SecurityType security = null;
+	
 	public GetNameInfoHandler(GetNameInfoDataMessage requestMsg) throws I2B2Exception  {
 		try {
 			nameInfoMsg = requestMsg;
 			vocabType = requestMsg.getVocabRequestType();
+			security = requestMsg.getMessageHeaderType().getSecurity();
 			setDbInfo(requestMsg.getMessageHeaderType());
 			// test case for bad user
 			//		nameInfoMsg.getMessageHeaderType().getSecurity().setUsername("aaaaaaa");
@@ -82,8 +85,11 @@ public class GetNameInfoHandler extends RequestHandler {
 		} 
 	
 		List<ConceptType> response = null;
+		// The DAO handles reduction inside the all-category loop; remember the
+		// original request because findNameInfo mutates category while iterating.
+		boolean allCategorySearch = "@".equals(vocabType.getCategory());
 		try {
-			response = conceptDao.findNameInfo(vocabType, project, this.getDbInfo());
+			response = conceptDao.findNameInfo(vocabType, project, security , this.getDbInfo());
 		} catch (I2B2DAOException e1) {
 			log.error(e1.getMessage());
 			responseMessageType = MessageFactory.doBuildErrorResponse(nameInfoMsg.getMessageHeaderType(), "Database error");
@@ -95,7 +101,7 @@ public class GetNameInfoHandler extends RequestHandler {
 		//jgk
 		// This does a linear search through fullnames for each previous fullname, O(n^2) :(
 		// BUT it assumes its sorted by hlevel so it only has to search through whats already seen - n(n+1)/2 operations 
-		if (response != null && response.size()>0 && vocabType.isReducedResults()!=null && vocabType.isReducedResults()) {
+		if (response != null && response.size()>0 && vocabType.isReducedResults()!=null && vocabType.isReducedResults() && !allCategorySearch && !(vocabType.isAncestors()!=null && vocabType.isAncestors())) {
 			ArrayList<String> seen = new ArrayList<String>(); 
 			ArrayList<ConceptType> keep = new ArrayList<ConceptType>();
 			Iterator it = response.iterator();
@@ -146,7 +152,7 @@ public class GetNameInfoHandler extends RequestHandler {
 			}
 			// No errors, non-empty response received
 			// If max is specified, check that response is not > max
-			else if(vocabType.getMax() != null && vocabType.getMax() != 0) {
+			else if(vocabType.getMax() != null && vocabType.getMax() != 0 && !(vocabType.isAncestors()!=null && vocabType.isAncestors())) {
 				Iterator itr = response.iterator();
 				int i=0;
 				while (itr.hasNext() && i<vocabType.getMax() )

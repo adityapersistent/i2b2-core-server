@@ -20,7 +20,7 @@ import edu.harvard.i2b2.common.exception.I2B2Exception;
 import edu.harvard.i2b2.ontology.util.OntologyUtil;
 import edu.harvard.i2b2.ontology.util.Roles;
 import edu.harvard.i2b2.ontology.ws.AddChildDataMessage;
-import edu.harvard.i2b2.ontology.ws.LoadDataMessage;
+import edu.harvard.i2b2.ontology.ws.UpdateTotalNumMessage;
 import edu.harvard.i2b2.ontology.ws.MessageFactory;
 import edu.harvard.i2b2.ontology.datavo.vdo.*;
 import edu.harvard.i2b2.ontology.ejb.DBInfoType;
@@ -31,16 +31,16 @@ import edu.harvard.i2b2.ontology.datavo.pm.*;
 import edu.harvard.i2b2.ontology.dao.*;
 
 public class CreateSearchMetadataHandler extends RequestHandler {
-	private LoadDataMessage  loadMsg = null;
-	private MetadataLoadType conceptsType = null;
+	private UpdateTotalNumMessage  loadMsg = null;
+	private UpdateConceptTotalNumType conceptsType = null;
 	private ProjectType projectInfo = null;
 	private DBInfoType dbInfo = null;
 	private SecurityType securityType = null;
 	
-	public CreateSearchMetadataHandler(LoadDataMessage requestMsg) throws I2B2Exception{
+	public CreateSearchMetadataHandler(UpdateTotalNumMessage requestMsg) throws I2B2Exception{
 
 		loadMsg = requestMsg;
-		conceptsType = requestMsg.getMetadataLoad();	
+		conceptsType = requestMsg.getChild();	
 		projectInfo = getRoleInfo(requestMsg.getMessageHeaderType());	
 		setDbInfo(requestMsg.getMessageHeaderType());
 		securityType = requestMsg.getMessageHeaderType().getSecurity();
@@ -62,15 +62,15 @@ public class CreateSearchMetadataHandler extends RequestHandler {
 			log.debug("USER_INVALID or PM_SERVICE_PROBLEM");
 			return response;	
 		}
-		/*
-		if(!Roles.getInstance().isRoleValid(projectInfo)){
+		
+		if(!Roles.getInstance().isRoleAdmin(projectInfo) || securityType.getUsername().equalsIgnoreCase("AGG_SERVICE_ACCOUNT")){
 			String response = null;
 			responseMessageType = MessageFactory.doBuildErrorResponse(loadMsg.getMessageHeaderType(), "User does not have correct privileges");
 			response = MessageFactory.convertToXMLString(responseMessageType);
 			log.debug("INVALID_USER_PRIV");
 			return response;	
 		}
-	*/
+	
 		else {	
 			try {
 			//	String userId = loadMsg.getMessageHeaderType().getSecurity().getUsername();
@@ -82,7 +82,12 @@ public class CreateSearchMetadataHandler extends RequestHandler {
 					@Override
 					public void run() {
 						try {
-							query.buildCreateSearchMetadata( projectInfo, dbInfo, securityType);
+							if (conceptsType != null && conceptsType.getOperationType() != null && (conceptsType.getOperationType().equalsIgnoreCase("synchronize_all")))
+							{
+								query.buildUpdateTotalNum(conceptsType.getProjectId(), dbInfo, securityType, conceptsType.getOperationType(), conceptsType.getCdm());
+							}
+							
+							query.buildCreateSearchMetadata(projectInfo, conceptsType.getProjectId(), dbInfo, securityType);
 						} catch (Exception e) {
 							log.error("i2b2 exception", e);
 						} catch (Throwable e) {
