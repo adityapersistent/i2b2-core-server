@@ -12,6 +12,24 @@ on:
         type: string
 
 jobs:
+
+  docker-check:
+    name: Verify Self-Hosted Runner Docker
+    runs-on: [self-hosted, Linux, X64, i2b2-cd]
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Verify Docker
+        run: |
+          docker --version
+          docker compose version
+          docker ps
+
+      - name: Test Compose
+        run: |
+          docker compose version
+
+
   build:
     name: Build & Publish i2b2-core-server image
     runs-on: ubuntu-latest
