@@ -97,6 +97,8 @@ jobs:
     runs-on: [self-hosted, Linux, X64]
     if: github.ref == 'refs/heads/master'
     needs: build 
+    environment: dev
+
 
     steps:
       - name: Checkout deployment repository
@@ -132,7 +134,7 @@ jobs:
 
           export docker_username=${{ secrets.DOCKER_HOST }}
           export docker_reponame=${{ secrets.DOCKER_REPO }}
-          
+
           # Build the image variables using the sanitized tags
           core_server_image="${docker_username}/${docker_reponame}:i2b2-core-server_${safe_core_branch}"
           # pgsql_image="${docker_username}/${docker_reponame}:i2b2-data-pgsql_${safe_data_branch}"
